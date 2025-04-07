@@ -3,7 +3,27 @@ import re
 
 #0 We get Local Desktop path
 
-desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+#desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+desktop = "C:\\Users\\bmorales\\OneDrive - rmrconsultores.com\\Escritorio\\BP-Release-Analyzer"
+
+#0 We create the function for deleting specific values from a Line. We're gonna use this quite a lot
+def remove_selected_process(remove_value):
+    lineas = content.splitlines()
+    return [linea for linea in lineas if remove_value not in linea]
+
+#0 This function, takes the value of the regex we put it in, and the value we're searching, and then uses the regex to search the provided value
+#After that, it returns the first value obtained, which in this case, will be the ID of the process we're trying to remove from our Release.
+def filter_selected_process_id(regex, content):
+    processes_id = re.findall(regex, content)
+    print(processes_id)
+    current_id = processes_id[0]
+    return current_id
+
+#0 Lastly, this function merges the splitted lines back, so we have our main file back into one
+def merge_splitted_lines(filter_lines):
+    contenido_limpio = "\n".join(filter_lines)
+    return contenido_limpio
+     
 
 #1 At first instance, we show all the main presentation in console.
 
@@ -56,21 +76,21 @@ while validation == False:
                     print(nombres[remove_index] + " Removed")
                                             
                     #Step 1: Remove the line that contains the value of the list 'nombres' which user selected to delete
-                    lineas = content.splitlines()
-                    lineas_filtradas = [linea for linea in lineas if nombres[remove_index] not in linea]
+                    lineas_filtradas = remove_selected_process(nombres[remove_index])
 
                     #Step 2: Here, we filter the <object> ID value in order to obtain the specific <object-group> which contains our process
-                    pattern = rf'<object id="(.*?)"\s+name="{nombres[remove_index]}"'
-                    processes_id = re.findall(pattern, content)
-                    current_id = processes_id[0]
+                    #regex = rf'<object id="(.*?)"\s+name="{nombres[remove_index]}"'
+                    #regex = rf'<process id="(.*?)"\s+"{nombres[remove_index]}"'
+                    regex = rf'<process name="{nombres[remove_index]}"\s+version="'
+                    print(regex)
+                    print(remove_index)
+                    current_id = filter_selected_process_id(regex, content)
 
-                    #Step 3: We reutilize the code of Step 1 in order to remove all the lines that contain the ID value of the process we want to remove
-                    lineas = content.splitlines()
-                    lineas_filtradas = [linea for linea in lineas if current_id not in linea]
+                    #Step 3: We reutilize the def of Step 1 in order to remove all the lines that contain the ID value of the process we want to remove
+                    lineas_filtradas = remove_selected_process(current_id)
 
                     #Step 4: Merge the splitted parts of the text back into one piece
-                    contenido_limpio = "\n".join(lineas_filtradas)
-                    content = contenido_limpio
+                    content = merge_splitted_lines(lineas_filtradas)
 
                     del nombres[remove_index]
             else:
