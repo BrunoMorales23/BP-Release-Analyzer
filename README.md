@@ -1,6 +1,6 @@
-# BP-Release-Analyzer
+# 🔍 BP-Release-Analyzer
 
-🔍 This project, is intended to be capable of split '.BPRelease' files, in order to get specific contents from each release, and also, analyze it's content in order to notify the user if their release is acomplishing the good practices of Blue Prism
+This project, is intended to be capable of split '.BPRelease' files, in order to get specific contents from each release, and also, analyze it's content in order to notify the user if their release is acomplishing the good practices of Blue Prism
 
 ---
 
@@ -23,15 +23,5 @@ That means, that the content is removed, but there's a chance of trash descripti
 1. Clone the repository or download it as ZIP.
 2. CD until you're in the directory where 'main.py' is.
 3. Execute 'python main.py' and follow the instructions.
-
----
-
-## 🧱 Roadmap
-
-✅ Trim of Processes and Objects (initial version, unclean)
-🔲 Structural cleanup and formatting
-🔲 Deeper analysis of Blue Prism best practices
-🔲 Component-wise export functionality
-🔲 Basic graphical user interface (GUI)
 
 ---
