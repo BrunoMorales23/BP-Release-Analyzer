@@ -64,6 +64,7 @@ while validation == False:
     clear_console()
     if success == True:
         print(Fore.GREEN + nombres[remove_index] + " Removed Successfully")
+        success = False
         del nombres[remove_index]
     elif success == False:
         print(Fore.RED + "Failed to delete this Object")
@@ -77,7 +78,7 @@ while validation == False:
             Fore.RED + """ 
 If you're done, write '0'   """))
             
-            if remove_index != 0: 
+            if remove_index != 0 and remove_index > 0 and remove_index <= i: 
                 remove_index = remove_index - 1  
 
                 try:                   
@@ -88,8 +89,9 @@ If you're done, write '0'   """))
 
                     regex = fr'<process[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></process>'
                     content = delete_content(regex, content)
+                    print(Fore.CYAN + f"Debug -" + current_id[0][0][:36])
 
-                    if len(content) >= 37:
+                    if len(current_id) >= 37:
                         raise ValueError(Fore.RED + "An Object was selected, switching to Object Regex...")
 
                     print(Fore.GREEN + "----Deleting an Process----")
@@ -105,11 +107,12 @@ If you're done, write '0'   """))
 
                             regex = rf'<object id="(.*?)"\s+name="{re.escape(nombres[remove_index])}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product)'
                             current_id = filter_selected_process_id(regex, content)
+                            print(Fore.CYAN + f"Debug -" + current_id[0][0][:36])
 
-                            regex = fr'<object[^>]*id="{re.escape(current_id[0][0][:36])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></object>'
+                            regex = fr'<object[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></object>'
                             content = delete_content(regex, content)
 
-                            lineas_filtradas = remove_selected_process(current_id[0][0][:36])
+                            lineas_filtradas = remove_selected_process(current_id[0][0])
 
                             content = merge_splitted_lines(lineas_filtradas)
                             success = True
@@ -117,7 +120,6 @@ If you're done, write '0'   """))
 
                     except IndexError:
                             success = False
-
             else:
                 validation = True
     else:
