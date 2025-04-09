@@ -6,7 +6,7 @@ This project, is intended to be capable of split '.BPRelease' files, in order to
 
 ## 🚧 Status
 
-Right now, this analyzer is capable of Trimming both Objects and Processess from the release, but not clean at all.
+Right now, this analyzer is capable of Trimming both Objects and Processes from the release, but not clean at all.
 That means, that the content is removed, but there's a chance of trash descriptions and tags are not deleted, which will cause the release not to work correctly.
 
 ---
@@ -23,5 +23,8 @@ That means, that the content is removed, but there's a chance of trash descripti
 1. Clone the repository or download it as ZIP.
 2. CD until you're in the directory where 'main.py' is.
 3. Execute 'python main.py' and follow the instructions.
+
+Note: This version is still unstable, so please, delete your Processes and Objects in order.
+Ex: "1, 1, 1, 3". "3, 6, 1, 2" Can cause exceptions.
 
 ---
