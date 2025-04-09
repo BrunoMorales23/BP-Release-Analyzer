@@ -14,16 +14,19 @@ def remove_selected_process(remove_value):
 #0 This function, takes the value of the regex we put it in, and the value we're searching, and then uses the regex to search the provided value
 #After that, it returns the first value obtained, which in this case, will be the ID of the process we're trying to remove from our Release.
 def filter_selected_process_id(regex, content):
-    processes_id = re.findall(regex, content)
-    print(processes_id)
-    current_id = processes_id[0]
+    processes_id = re.findall(regex, content, re.DOTALL)
+    current_id = processes_id
     return current_id
 
 #0 Lastly, this function merges the splitted lines back, so we have our main file back into one
 def merge_splitted_lines(filter_lines):
     contenido_limpio = "\n".join(filter_lines)
     return contenido_limpio
-     
+
+#0 EXTRA - Delete Invalid Descriptions in script
+def delete_content(regex, content):
+     contenido_limpio = re.sub(regex, '', content, flags=re.DOTALL)
+     return contenido_limpio
 
 #1 At first instance, we show all the main presentation in console.
 
@@ -79,15 +82,18 @@ while validation == False:
                     lineas_filtradas = remove_selected_process(nombres[remove_index])
 
                     #Step 2: Here, we filter the <object> ID value in order to obtain the specific <object-group> which contains our process
-                    #regex = rf'<object id="(.*?)"\s+name="{nombres[remove_index]}"'
-                    #regex = rf'<process id="(.*?)"\s+"{nombres[remove_index]}"'
-                    regex = rf'<process name="{nombres[remove_index]}"\s+version="'
-                    print(regex)
-                    print(remove_index)
+                    #regex = rf'<process name="{nombres[remove_index]}"\s+version="'
+                    #regex = rf'<process id="(.*?)"\s+name="{nombres[remove_index]}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product/process">)'
+                    regex = rf'<process id="(.*?)"\s+name="{nombres[remove_index]}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product/process">)'
                     current_id = filter_selected_process_id(regex, content)
 
+
+                    regex = fr'<process[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></process>'
+                    #content = re.sub(regex, '', content, flags=re.DOTALL)
+                    content = delete_content(regex, content)
+
                     #Step 3: We reutilize the def of Step 1 in order to remove all the lines that contain the ID value of the process we want to remove
-                    lineas_filtradas = remove_selected_process(current_id)
+                    lineas_filtradas = remove_selected_process(current_id[0][0])
 
                     #Step 4: Merge the splitted parts of the text back into one piece
                     content = merge_splitted_lines(lineas_filtradas)
