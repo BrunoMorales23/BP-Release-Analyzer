@@ -8,9 +8,6 @@ import time
 #desktop = os.path.join(os.path.expanduser("~"), "Desktop")
 desktop = "C:\\Users\\bmorales\\OneDrive - rmrconsultores.com\\Escritorio\\BP-Release-Analyzer"
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-
 def remove_selected_process(remove_value):
     lineas = content.splitlines()
     return [linea for linea in lineas if remove_value not in linea]
