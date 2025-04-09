@@ -3,6 +3,7 @@ import configparser
 import re
 from colorama import Fore, Style, init
 init(autoreset=True)
+import time
 
 #desktop = os.path.join(os.path.expanduser("~"), "Desktop")
 desktop = "C:\\Users\\bmorales\\OneDrive - rmrconsultores.com\\Escritorio\\BP-Release-Analyzer"
@@ -24,9 +25,11 @@ def merge_splitted_lines(filter_lines):
     return contenido_limpio
 
 def delete_content(regex, content):
-     contenido_limpio = re.sub(regex, '', content, flags=re.DOTALL)
-     return contenido_limpio
+    contenido_limpio = re.sub(regex, '', content, flags=re.DOTALL)
+    return contenido_limpio
 
+def clear_console():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 print(Fore.GREEN + f"""Welcome to BP Release Analyzer
 Please, drag the path of the '.bprelease' file you want to work on""" +
@@ -50,13 +53,22 @@ while validation == False:
 
 with open(path, 'r', encoding='utf-8') as archivo:
         content = archivo.read()
-        print(Fore.GREEN + "Archivo cargado correctamente")
+        print(Fore.GREEN + "File loaded successfully.")
 
 nombres = re.findall(r'<process name="(.*?)"\s+version="', content)
 
 validation = False
+success = ""
 
 while validation == False:
+    clear_console()
+    if success == True:
+        print(Fore.GREEN + nombres[remove_index] + " Removed Successfully")
+        del nombres[remove_index]
+    elif success == False:
+        print(Fore.RED + "Failed to delete this Object")
+    else:
+        pass
 
     for i, nombre in enumerate(nombres, start=1):
         print(Fore.YELLOW + f"{i} - "+ Fore.WHITE + f"{nombre}")
@@ -64,39 +76,48 @@ while validation == False:
             remove_index = int(input(Fore.YELLOW + """Please, select which Process or Object you wish to remove from release """ +
             Fore.RED + """ 
 If you're done, write '0'   """))
+            
             if remove_index != 0: 
-                    remove_index = remove_index - 1
-                    try:                        
-                        lineas_filtradas = remove_selected_process(nombres[remove_index])
+                remove_index = remove_index - 1  
 
-                        regex = rf'<process id="(.*?)"\s+name="{nombres[remove_index]}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product)'
-                        current_id = filter_selected_process_id(regex, content)
+                try:                   
+                    lineas_filtradas = remove_selected_process(nombres[remove_index])
 
+                    regex = rf'<process id="(.*?)"\s+name="{nombres[remove_index]}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product)'
+                    current_id = filter_selected_process_id(regex, content)
 
-                        regex = fr'<process[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></process>'
-                        content = delete_content(regex, content)
+                    regex = fr'<process[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></process>'
+                    content = delete_content(regex, content)
 
-                        print(Fore.GREEN + "----Deleting an Process----")
-                        lineas_filtradas = remove_selected_process(current_id[0][0])
+                    if len(content) >= 37:
+                        raise ValueError(Fore.RED + "An Object was selected, switching to Object Regex...")
 
-                        content = merge_splitted_lines(lineas_filtradas)
+                    print(Fore.GREEN + "----Deleting an Process----")
+                    lineas_filtradas = remove_selected_process(current_id[0][0])
+
+                    content = merge_splitted_lines(lineas_filtradas)
+                    success = True
+                    time.sleep(1)
+                except (IndexError, ValueError) as RegexError:
+                    try:
+                            print(Fore.GREEN + "----Deleting an Object----")
+                            lineas_filtradas = remove_selected_process(nombres[remove_index])
+
+                            regex = rf'<object id="(.*?)"\s+name="{re.escape(nombres[remove_index])}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product)'
+                            current_id = filter_selected_process_id(regex, content)
+
+                            regex = fr'<object[^>]*id="{re.escape(current_id[0][0][:36])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></object>'
+                            content = delete_content(regex, content)
+
+                            lineas_filtradas = remove_selected_process(current_id[0][0][:36])
+
+                            content = merge_splitted_lines(lineas_filtradas)
+                            success = True
+                            time.sleep(1)
 
                     except IndexError:
-                        print(Fore.GREEN + "----Deleting an Object----")
-                        lineas_filtradas = remove_selected_process(nombres[remove_index])
+                            success = False
 
-                        regex = rf'<object id="(.*?)"\s+name="{re.escape(nombres[remove_index])}"(.*?)(?=\s+xmlns="http://www.blueprism.co.uk/product)'
-                        current_id = filter_selected_process_id(regex, content)
-
-                        regex = fr'<object[^>]*id="{re.escape(current_id[0][0])}"[^>]*name="{re.escape(nombres[remove_index])}"[^>]*>.*?</stage></process></object>'
-                        content = delete_content(regex, content)
-
-                        lineas_filtradas = remove_selected_process(current_id[0][0])
-
-                        content = merge_splitted_lines(lineas_filtradas)
-
-                    print(Fore.GREEN + nombres[remove_index] + " Removed Successfully")
-                    del nombres[remove_index]
             else:
                 validation = True
     else:
